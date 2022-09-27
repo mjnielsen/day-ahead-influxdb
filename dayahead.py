@@ -23,14 +23,14 @@ def main():
                 "&periodStart={period_start}"
                 "&periodEnd={period_end}").format(
                     entsoe_token=ENTSOE_TOKEN,
-                    period_start=period_start, 
+                    period_start=period_start,
                     period_end=period_end)
 
     data = xmltodict.parse(requests.get(request_url).text)
-  
+
     with InfluxDBClient(url=INFLUX_URL, token=INFLUX_TOKEN, org=INFLUX_ORG) \
             as influx_client:
-        
+
         write_api = influx_client.write_api(write_options=SYNCHRONOUS)
 
         try:
@@ -40,7 +40,6 @@ def main():
 
         first_hour = parse(day['Period']['timeInterval']['start'])
         for hour in day['Period']['Point']:
-            print(hour)
             write_api.write(INFLUX_BUCKET, INFLUX_ORG, Point.from_dict(
                 {
                     "measurement": "hourlySpotPrice",
